@@ -7,9 +7,10 @@ class Consumable(GridObject):
         self.current_amount = max_amount
     
     def consume(self, amount=1):
-        if self.current_amount >= amount:
-            self.current_amount -= amount
-            return 1
+        if self.current_amount >= 0:
+            consumed = min(self.current_amount, amount)
+            self.current_amount -= consumed
+            return consumed
         return 0
     
     def fill(self, amount=None):

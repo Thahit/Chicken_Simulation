@@ -7,4 +7,4 @@ class Bath(Consumable):
         super().__init__(x, y, max_amount=-1)
     
     def consume(self):
-        return random.randint(10, 25)
+        return random.randint(100, 250)

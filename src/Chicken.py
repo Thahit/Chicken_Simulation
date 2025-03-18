@@ -10,7 +10,7 @@ class Chicken(GridObject, ABC):
         super().__init__(x, y)
         self.cage = cage
         self.food = 100
-        self.water = 100
+        self.water = 1000
         self.clean = 100
         self.id = Chicken._id_counter
         Chicken._id_counter += 1
@@ -49,7 +49,9 @@ class Chicken(GridObject, ABC):
         bath = self.get_objects_in_range(self.cage.bathing_areas)
         return chickens, food, water
         
-
+    def consume_energy(self):
+        self.food -=1
+        self.water -=1
 
 class RandomChicken(Chicken):
     def move(self):
@@ -58,3 +60,6 @@ class RandomChicken(Chicken):
         
         if self.cage and self.cage.is_valid_position(new_x, new_y):
             self.x, self.y = new_x, new_y
+        
+        # energy cost
+        self.consume_energy()
