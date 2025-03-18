@@ -6,4 +6,4 @@ class Food(Consumable):
         super().__init__(x, y, max_amount)
 
     def consume(self, amount=25):
-        super.consume(amount)
+        return super().consume(amount)

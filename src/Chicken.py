@@ -8,7 +8,7 @@ class Chicken(GridObject, ABC):
     _id_counter = 0
     def __init__(self, x, y, cage=None):
         super().__init__(x, y)
-        self.cage = cage
+        self.cage: Cage = cage
         self.food = 100
         self.water = 1000
         self.clean = 100
