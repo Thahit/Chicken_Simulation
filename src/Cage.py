@@ -14,6 +14,11 @@ class Cage:
         
         for chicken in self.chickens:
             chicken.set_cage(self)
+        
+        self.all_object_names = [f"chicken_{i}" for i in range(len(self.chickens))] + \
+                [f"food_{i}" for i in range(len(self.food_sources))] +   \
+                [f"water_{i}" for i in range(len(self.water_sources))] + \
+                [f"bath_{i}" for i in range(len(self.bathing_areas))]
     
     def is_valid_position(self, x, y):
         return 0 <= x < self.width and 0 <= y < self.height
@@ -71,3 +76,19 @@ class Cage:
                     adj_matrix[i][j] = 1
         
         return np.array(adj_matrix)
+
+    def simulate(self, steps, adj_matrix_interval=None, visual=True):
+        adj_matrices = []
+        for step in range(steps):
+            self.update()
+            if visual:
+                self.display()
+            if adj_matrix_interval and step % adj_matrix_interval == 0:
+                adj_matrices.append(self.get_adj_matr())
+        
+        print("End report:")
+        for chicken in self.chickens:
+            #print the status of each chicken
+            print(f"Chicken {chicken.id} \tFood: {chicken.food} \tWater: {chicken.water} \tClean: {chicken.clean}")
+
+        return adj_matrices
