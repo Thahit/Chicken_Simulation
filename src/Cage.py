@@ -2,6 +2,8 @@ from src.Food import Food
 from src.Water import Water
 from src.Bath import Bath
 import numpy as np
+import pygame
+
 
 class Cage:
     def __init__(self, width, height, chickens, food_positions, water_positions, bath_positions):
@@ -27,7 +29,7 @@ class Cage:
         for chicken in self.chickens:
             chicken.act()
     
-    def display(self):
+    def display_printed(self):
         grid = [['.' for _ in range(self.width)] for _ in range(self.height)]
         
         for food in self.food_sources:
@@ -82,6 +84,52 @@ class Cage:
         for step in range(steps):
             self.update()
             if visual:
+                self.display_printed()
+            if adj_matrix_interval and step % adj_matrix_interval == 0:
+                adj_matrices.append(self.get_adj_matr())
+        
+        print("End report:")
+        for chicken in self.chickens:
+            #print the status of each chicken
+            print(f"Chicken {chicken.id} \tFood: {chicken.food} \tWater: {chicken.water} \tClean: {chicken.clean}")
+
+        return adj_matrices
+    
+    
+    def simulate_visual(self, steps, adj_matrix_interval=None, visual=True):
+        pygame.init()
+        self.TILE_SIZE = 64  # or whatever size you want
+        self.screen = pygame.display.set_mode((self.width * self.TILE_SIZE, self.height * self.TILE_SIZE))
+        self.clock = pygame.time.Clock()
+
+        # Load images
+        surf_base = pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
+        surf_base.fill((255, 255, 255))  # fill it white
+        surf_food = pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
+        surf_food.fill((200, 100, 100))
+        surf_water = pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
+        surf_water.fill((0, 0, 255))
+        surf_bath= pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
+        surf_bath.fill((0, 200, 100))
+        self.IMAGES = {
+            #'.': pygame.Surface((self.TILE_SIZE, self.TILE_SIZE)),  # blank tile
+            #'F': pygame.image.load('food.png'),
+            #'W': pygame.image.load('water.png'),
+            #'B': pygame.image.load('bath.png'),
+            #'C': pygame.image.load('chicken.png'),
+            '.': surf_base,  # White empty
+            'F': surf_food,      # Green food
+            'W': surf_water,      # Blue water
+            'B': surf_bath,    # Yellow bath
+            'C': pygame.image.load('img/chicken_img.jpeg'),      #
+        }
+        for key in self.IMAGES:
+            self.IMAGES[key] = pygame.transform.scale(self.IMAGES[key], (self.TILE_SIZE, self.TILE_SIZE))
+
+        adj_matrices = []
+        for step in range(steps):
+            self.update()
+            if visual:
                 self.display()
             if adj_matrix_interval and step % adj_matrix_interval == 0:
                 adj_matrices.append(self.get_adj_matr())
@@ -92,3 +140,30 @@ class Cage:
             print(f"Chicken {chicken.id} \tFood: {chicken.food} \tWater: {chicken.water} \tClean: {chicken.clean}")
 
         return adj_matrices
+    
+    def display(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
+        self.screen.fill((0, 0, 0))  # Clear screen
+
+        grid = [['.' for _ in range(self.width)] for _ in range(self.height)]
+
+        for food in self.food_sources:
+            grid[food.y][food.x] = 'F'
+        for water in self.water_sources:
+            grid[water.y][water.x] = 'W'
+        for bath in self.bathing_areas:
+            grid[bath.y][bath.x] = 'B'
+        for chicken in self.chickens:
+            grid[chicken.y][chicken.x] = 'C'
+
+        for y, row in enumerate(grid):
+            for x, cell in enumerate(row):
+                img = self.IMAGES.get(cell, self.IMAGES['.'])
+                self.screen.blit(img, (x * self.TILE_SIZE, y * self.TILE_SIZE))
+
+        pygame.display.flip()
+        self.clock.tick(2)  # Control FPS
