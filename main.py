@@ -6,7 +6,8 @@ from src.utils import calculate_avg_adj_list, visualize_graph, read_all_weeks, c
 import random
 import numpy as np
 
-def run_simulation(use_follower_chickens=False, height=12, width=10, n_chicken=20, analyze_only_chicken=False):
+def run_simulation(use_follower_chickens=False, height=8, width=12, n_chicken=20, analyze_only_chicken=False,
+                   n_steps=1000, visual=False):
     """
     Run a chicken simulation with either RandomChickens or FollowerChickens.
     
@@ -23,8 +24,8 @@ def run_simulation(use_follower_chickens=False, height=12, width=10, n_chicken=2
     # Create an empty cage first
     cage = Cage(width=width, height=height, chickens=[], 
                 food_positions=[(0, 2), (0, 3)], 
-                water_positions=[(9, 1)], 
-                bath_positions=[(5, 9)])
+                water_positions=[(7, 1)], 
+                bath_positions=[(5, 7)])
     
     # Create chickens based on the specified type with reference to the cage
     if use_follower_chickens:
@@ -39,9 +40,17 @@ def run_simulation(use_follower_chickens=False, height=12, width=10, n_chicken=2
     
     # Add chickens to the cage
     cage.chickens = chickens
+    #this fcks up the names....
+    cage.all_object_names = [f"chicken_{i}" for i in range(len(cage.chickens))] + \
+                [f"food_{i}" for i in range(len(cage.food_sources))] +   \
+                [f"water_{i}" for i in range(len(cage.water_sources))] + \
+                [f"bath_{i}" for i in range(len(cage.bathing_areas))]
     
     # Run simulation
-    adj_lists = cage.simulate_visual(1000, adj_matrix_interval=5, visual=True)
+    if visual:
+        adj_lists = cage.simulate_visual(n_steps, adj_matrix_interval=5, visual=True)
+    else:
+        adj_lists = cage.simulate(n_steps, adj_matrix_interval=5, visual=True)
     
     # Process results
     avg_adj_list = calculate_avg_adj_list(adj_lists)
@@ -157,19 +166,22 @@ def assign_social_relationships(chickens):
 
 if __name__ == "__main__":
     # Parameters
-    HEIGHT = 12
-    WIDTH = 10
+    HEIGHT = 8
+    WIDTH = 12
     N_CHICKEN = 20
-    ANALYZE_ONLY_CHICKEN = False
+    ANALYZE_ONLY_CHICKEN = True
     USE_FOLLOWER_CHICKENS = True  # Set to False to use the original RandomChicken behavior
-    
+    N_STEPS=1000
+    VISUAL = True
     # Run the simulation
     avg_adj_list, names, df = run_simulation(
         use_follower_chickens=USE_FOLLOWER_CHICKENS,
         height=HEIGHT,
         width=WIDTH,
         n_chicken=N_CHICKEN,
-        analyze_only_chicken=ANALYZE_ONLY_CHICKEN
+        analyze_only_chicken=ANALYZE_ONLY_CHICKEN,
+        n_steps = N_STEPS,
+        visual=VISUAL,
     )
     
     # Additional analysis can be added here

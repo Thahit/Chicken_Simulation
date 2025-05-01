@@ -173,6 +173,8 @@ def create_graph_from_adj_matrix(adj_matrix, clustering_method='louvain',
                            node_color=communities, alpha=0.7)
     nx.draw_networkx_edges(G, pos, width=1.0, alpha=0.5)
     if all_object_names != None:
+        print(f"{len(all_object_names)=}, {len(G.nodes())=}")
+        print(all_object_names)
         node_names = {i: all_object_names[i] for i in G.nodes()}
 
     nx.draw_networkx_labels(G,pos=pos, labels= node_names if all_object_names!=None else None, font_size=12)

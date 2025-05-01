@@ -136,10 +136,6 @@ class WeightedRandomChicken(Chicken):
         self.consume_energy()
 
 
-
-
-
-
 class FollowerChicken(WeightedRandomChicken):
     def __init__(self, x, y, cage=None):
         super().__init__(x, y, cage)
@@ -190,9 +186,9 @@ class FollowerChicken(WeightedRandomChicken):
         cleanliness_need = max(0, (100 - self.clean) / 100)  # 0 when clean, 1 when dirty
         
         # Need weights - how much each need influences decisions
-        hunger_weight = 3.0
+        hunger_weight = 3.5
         thirst_weight = 3.5  # Slightly more important than hunger
-        cleanliness_weight = 2.0  # Less critical than food/water
+        cleanliness_weight = 1.0  # Less critical than food/water
         
         # Calculate current distances to nearest resources
         current_dist_to_food = min([abs(self.x - fx) + abs(self.y - fy) for fx, fy in self.food_coords], default=float('inf'))
