@@ -79,7 +79,9 @@ class Cage:
         
         return np.array(adj_matrix)
 
-    def simulate(self, steps, adj_matrix_interval=None, visual=True):
+    def simulate(self, steps, adj_matrix_interval=None, visual=True, burn_in =100):
+        for _ in range(burn_in):
+            self.update()
         adj_matrices = []
         for step in range(steps):
             self.update()
@@ -96,7 +98,9 @@ class Cage:
         return adj_matrices
     
     
-    def simulate_visual(self, steps, adj_matrix_interval=None, visual=True):
+    def simulate_visual(self, steps, adj_matrix_interval=None, visual=True, burn_in =100):
+        for _ in range(burn_in):
+            self.update()
         if visual:
             pygame.init()
             self.TILE_SIZE = 64  # or whatever size you want
