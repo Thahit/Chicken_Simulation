@@ -18,20 +18,24 @@ def normalize_adj_matrix(adj_matrix: np.array):
      
     return adj_matrix
 
+
 def calculate_avg_adj_list(adj_lists):
     adj_lists = np.array(adj_lists)
     return np.mean(adj_lists, axis=0)
 
-def create_graph(adj_matrix, min_weight=None):
+
+def create_graph(adj_matrix, min_weight=None, max_size=None):
     G = nx.Graph()
     num_nodes = adj_matrix.shape[0]
     for i in range(num_nodes):
         for j in range(i + 1, num_nodes):  # Assuming an undirected graph
             weight = adj_matrix[i, j]
             if weight != 0 and (min_weight is None or weight >= min_weight):
-                G.add_edge(i, j, weight=weight)
+                G.add_edge(i, j, weight=round(weight, 2))
     return G
-def visualize_graph(adj_matrix, all_object_names, min_weight=None):
+
+
+def visualize_graph(adj_matrix, all_object_names, min_weight=None, max_size=None):
     """
     Visualizes a weighted graph from an adjacency matrix, coloring edges by weight.
     
@@ -48,7 +52,8 @@ def visualize_graph(adj_matrix, all_object_names, min_weight=None):
         node_types[idx] = obj_type
 
     G = create_graph(adj_matrix, min_weight=min_weight)
-    
+    if max_size!= None:# to only take chicken for example
+        G = G.subgraph(range(max_size))
     #G.add_edge(1, 2, weight=1)# for testing
     pos = nx.spring_layout(G) 
     
@@ -154,9 +159,7 @@ def create_graph_from_adj_matrix(adj_matrix, clustering_method='louvain',
         all_object_names=None, max_size=None):
     G = create_graph(adj_matrix)
     if max_size!= None:# to only take chicken for example
-        nodes = list(G.nodes())[:max_size]
-
-        G = G.subgraph(nodes)
+        G = G.subgraph(range(max_size))
     
 
     if clustering_method == 'louvain':

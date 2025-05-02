@@ -97,34 +97,35 @@ class Cage:
     
     
     def simulate_visual(self, steps, adj_matrix_interval=None, visual=True):
-        pygame.init()
-        self.TILE_SIZE = 64  # or whatever size you want
-        self.screen = pygame.display.set_mode((self.width * self.TILE_SIZE, self.height * self.TILE_SIZE))
-        self.clock = pygame.time.Clock()
+        if visual:
+            pygame.init()
+            self.TILE_SIZE = 64  # or whatever size you want
+            self.screen = pygame.display.set_mode((self.width * self.TILE_SIZE, self.height * self.TILE_SIZE))
+            self.clock = pygame.time.Clock()
 
-        # Load images
-        surf_base = pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
-        surf_base.fill((255, 255, 255))  # fill it white
-        surf_food = pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
-        surf_food.fill((200, 100, 100))
-        surf_water = pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
-        surf_water.fill((0, 0, 255))
-        surf_bath= pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
-        surf_bath.fill((0, 200, 100))
-        self.IMAGES = {
-            #'.': pygame.Surface((self.TILE_SIZE, self.TILE_SIZE)),  # blank tile
-            #'F': pygame.image.load('food.png'),
-            #'W': pygame.image.load('water.png'),
-            #'B': pygame.image.load('bath.png'),
-            #'C': pygame.image.load('chicken.png'),
-            '.': surf_base,  # White empty
-            'F': surf_food,      # Green food
-            'W': surf_water,      # Blue water
-            'B': surf_bath,    # Yellow bath
-            'C': pygame.image.load('img/chicken_img.jpeg'),      #
-        }
-        for key in self.IMAGES:
-            self.IMAGES[key] = pygame.transform.scale(self.IMAGES[key], (self.TILE_SIZE, self.TILE_SIZE))
+            # Load images
+            surf_base = pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
+            surf_base.fill((255, 255, 255))  # fill it white
+            surf_food = pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
+            surf_food.fill((200, 100, 100))
+            surf_water = pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
+            surf_water.fill((0, 0, 255))
+            surf_bath= pygame.Surface((self.TILE_SIZE, self.TILE_SIZE))
+            surf_bath.fill((0, 200, 100))
+            self.IMAGES = {
+                #'.': pygame.Surface((self.TILE_SIZE, self.TILE_SIZE)),  # blank tile
+                #'F': pygame.image.load('food.png'),
+                #'W': pygame.image.load('water.png'),
+                #'B': pygame.image.load('bath.png'),
+                #'C': pygame.image.load('chicken.png'),
+                '.': surf_base,  # White empty
+                'F': surf_food,      # Green food
+                'W': surf_water,      # Blue water
+                'B': surf_bath,    # Yellow bath
+                'C': pygame.image.load('img/chicken_img.jpeg'),      #
+            }
+            for key in self.IMAGES:
+                self.IMAGES[key] = pygame.transform.scale(self.IMAGES[key], (self.TILE_SIZE, self.TILE_SIZE))
 
         adj_matrices = []
         for step in range(steps):

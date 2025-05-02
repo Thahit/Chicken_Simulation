@@ -186,8 +186,8 @@ class FollowerChicken(WeightedRandomChicken):
         cleanliness_need = max(0, (100 - self.clean) / 100)  # 0 when clean, 1 when dirty
         
         # Need weights - how much each need influences decisions
-        hunger_weight = 3.5
-        thirst_weight = 3.5  # Slightly more important than hunger
+        hunger_weight = 20
+        thirst_weight = 3.5  
         cleanliness_weight = 1.0  # Less critical than food/water
         
         # Calculate current distances to nearest resources

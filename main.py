@@ -7,7 +7,7 @@ import random
 import numpy as np
 
 def run_simulation(use_follower_chickens=False, height=8, width=12, n_chicken=20, analyze_only_chicken=False,
-                   n_steps=1000, visual=False):
+                   n_steps=1000, visual=False, adj_matrix_interval=5, pygames_grid=True):
     """
     Run a chicken simulation with either RandomChickens or FollowerChickens.
     
@@ -23,9 +23,9 @@ def run_simulation(use_follower_chickens=False, height=8, width=12, n_chicken=20
     """
     # Create an empty cage first
     cage = Cage(width=width, height=height, chickens=[], 
-                food_positions=[(0, 2), (0, 3)], 
-                water_positions=[(7, 1)], 
-                bath_positions=[(5, 7)])
+                food_positions=[(9, 4), (8, height-3)], 
+                water_positions=[(width-3, height-4)], 
+                bath_positions=[(width-7, 0),(width-6, 0),(width-5, 0)])
     
     # Create chickens based on the specified type with reference to the cage
     if use_follower_chickens:
@@ -47,10 +47,10 @@ def run_simulation(use_follower_chickens=False, height=8, width=12, n_chicken=20
                 [f"bath_{i}" for i in range(len(cage.bathing_areas))]
     
     # Run simulation
-    if visual:
-        adj_lists = cage.simulate_visual(n_steps, adj_matrix_interval=5, visual=True)
+    if pygames_grid:
+        adj_lists = cage.simulate_visual(n_steps, adj_matrix_interval=adj_matrix_interval, visual=visual)
     else:
-        adj_lists = cage.simulate(n_steps, adj_matrix_interval=5, visual=True)
+        adj_lists = cage.simulate(n_steps, adj_matrix_interval=5, visual=visual)
     
     # Process results
     avg_adj_list = calculate_avg_adj_list(adj_lists)
@@ -59,6 +59,8 @@ def run_simulation(use_follower_chickens=False, height=8, width=12, n_chicken=20
     print("Analysis")
     df = read_all_weeks(adj_lists, week_size=5)
     
+    visualize_graph(avg_adj_list, names, min_weight=.1,
+                    max_size=n_chicken if analyze_only_chicken else None)
     # Create graph visualization
     create_graph_from_adj_matrix(avg_adj_list, all_object_names=names, 
                               clustering_method='louvain', 
@@ -166,13 +168,15 @@ def assign_social_relationships(chickens):
 
 if __name__ == "__main__":
     # Parameters
-    HEIGHT = 8
-    WIDTH = 12
+    HEIGHT = 10
+    WIDTH = 18
     N_CHICKEN = 20
     ANALYZE_ONLY_CHICKEN = True
     USE_FOLLOWER_CHICKENS = True  # Set to False to use the original RandomChicken behavior
-    N_STEPS=1000
-    VISUAL = True
+    N_STEPS=1440
+    VISUAL = False
+    INTERVAL = 10
+    print(f"Need {3*(60/5)*4=} observations and have {N_STEPS/INTERVAL=}")
     # Run the simulation
     avg_adj_list, names, df = run_simulation(
         use_follower_chickens=USE_FOLLOWER_CHICKENS,
@@ -182,6 +186,7 @@ if __name__ == "__main__":
         analyze_only_chicken=ANALYZE_ONLY_CHICKEN,
         n_steps = N_STEPS,
         visual=VISUAL,
+        adj_matrix_interval= INTERVAL,
     )
     
     # Additional analysis can be added here
