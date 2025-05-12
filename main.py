@@ -1,8 +1,7 @@
 from src.Cage import Cage
 from src.Chicken import RandomChicken
-from src.Chicken import WeightedRandomChicken
 from src.Chicken import FollowerChicken
-from src.utils import calculate_avg_adj_list, visualize_graph, read_all_weeks, create_graph_from_adj_matrix, find_roles
+from src.utils import calculate_avg_adj_list, visualize_graph, read_all_weeks, create_graph_from_adj_matrix
 import random
 import numpy as np
 
@@ -85,29 +84,24 @@ def assign_social_relationships_even_vs_odd(chickens):
     """
     n_chicken = len(chickens)
 
-    # Iterate over all chickens to assign relationships
     for i in range(n_chicken):
-        # Chickens at even indices are friends with all other even-indexed chickens
         if i % 2 == 0:
             for j in range(i + 1, n_chicken):
                 if j % 2 == 0:  # Same parity, even index -> friendship
                     chickens[i].add_friend(chickens[j])
-                    chickens[j].add_friend(chickens[i])  # Mutual friendship
-        # Chickens at odd indices are friends with all other odd-indexed chickens
+                    chickens[j].add_friend(chickens[i])  
         else:
             for j in range(i + 1, n_chicken):
-                if j % 2 != 0:  # Same parity, odd index -> friendship
+                if j % 2 != 0:  
                     chickens[i].add_friend(chickens[j])
-                    chickens[j].add_friend(chickens[i])  # Mutual friendship
+                    chickens[j].add_friend(chickens[i]) 
     
-    # Assign enmities between even and odd indexed chickens
     for i in range(n_chicken):
         for j in range(i + 1, n_chicken):
             if (i % 2 == 0 and j % 2 != 0) or (i % 2 != 0 and j % 2 == 0):
                 chickens[i].add_enemy(chickens[j])
-                chickens[j].add_enemy(chickens[i])  # Mutual enmity
-    
-    # Print relationship statistics
+                chickens[j].add_enemy(chickens[i])  
+
     print("\nSocial Relationship Statistics:")
     friend_counts = [len(chicken.friends) for chicken in chickens]
     enemy_counts = [len(chicken.enemies) for chicken in chickens]
@@ -221,7 +215,7 @@ def assign_social_relationships(chickens):
 
 
 if __name__ == "__main__":
-    seed = 0 # 5
+    seed = 0 
     random.seed(seed)
     np.random.seed(seed)
 
@@ -231,7 +225,7 @@ if __name__ == "__main__":
     N_CHICKEN = 20
     ANALYZE_ONLY_CHICKEN = False
     USE_FOLLOWER_CHICKENS = True  # Set to False to use the original RandomChicken behavior
-    N_STEPS=1440
+    N_STEPS=1440 #*5
     VISUAL = False
     INTERVAL = 10
     GROUPS = False
@@ -249,6 +243,4 @@ if __name__ == "__main__":
         groups=GROUPS,
     )
     
-    if USE_FOLLOWER_CHICKENS:
-        print("\nAnalyzing social groups and behavior patterns...")
-        # Add any follower-specific analysis here
+    

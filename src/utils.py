@@ -1,8 +1,6 @@
 import numpy as np
-import random
 import networkx as nx
 import matplotlib.pyplot as plt
-import matplotlib
 import matplotlib.patches as mpatches  # For adding legend
 import pandas as pd
 import community as community_louvain  # For modularity-based community detection
@@ -27,6 +25,8 @@ def calculate_avg_adj_list(adj_lists):
 def create_graph(adj_matrix, min_weight=None, max_size=None):
     G = nx.Graph()
     num_nodes = adj_matrix.shape[0]
+    G.add_nodes_from(range(num_nodes))
+
     for i in range(num_nodes):
         for j in range(i + 1, num_nodes):  # Assuming an undirected graph
             weight = adj_matrix[i, j]
@@ -161,7 +161,6 @@ def create_graph_from_adj_matrix(adj_matrix, clustering_method='louvain',
     if max_size!= None:# to only take chicken for example
         G = G.subgraph(range(max_size))
     
-
     if clustering_method == 'louvain':
         partition = community_louvain.best_partition(G)
         communities = list(partition.values())
