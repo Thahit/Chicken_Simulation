@@ -14,10 +14,4 @@ Chickens form social bonds and prefer staying close to familiar individuals (Rod
 to copy their environment, and as we know, animals need to eat...
 
 
-### maybe for later
-some individuals dominate access to food or shelter. https://www.jstor.org/stable/1365008?casa_token=yejizOYOdf4AAAAA%3AEkDuSOWUz8rhZ_jXHwSjh4zo5Rezyo3NPWJ7Be1OQYzhS7h6mBm74W-k3_aYY9ksjwBhGC9X1eKToybPp2EWLsRyDVJc4GN8YKQvOLF3eHwI_WWVaIIEtA
-
-Social interactions are often modeled using game-theoretic approaches or rule-based aggression/avoidance mechanisms.    
-
-
 
