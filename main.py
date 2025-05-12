@@ -7,7 +7,7 @@ import random
 import numpy as np
 
 def run_simulation(use_follower_chickens=False, height=8, width=12, n_chicken=20, analyze_only_chicken=False,
-                   n_steps=1000, visual=False, adj_matrix_interval=5, pygames_grid=True):
+                   n_steps=1000, visual=False, adj_matrix_interval=5, pygames_grid=True, groups=False):
     """
     Run a chicken simulation with either RandomChickens or FollowerChickens.
     
@@ -33,7 +33,10 @@ def run_simulation(use_follower_chickens=False, height=8, width=12, n_chicken=20
                     for _ in range(n_chicken)]
         
         # Assign social relationships
-        assign_social_relationships(chickens)
+        if groups:
+            assign_social_relationships_even_vs_odd(chickens)
+        else:
+            assign_social_relationships(chickens)
     else:
         chickens = [RandomChicken(random.randint(0, width-1), random.randint(0, height-1), cage) 
                     for _ in range(n_chicken)]
@@ -68,6 +71,54 @@ def run_simulation(use_follower_chickens=False, height=8, width=12, n_chicken=20
     
     #find_roles(avg_adj_list, max_size=n_chicken if analyze_only_chicken else None)
     return avg_adj_list, names, df
+
+def assign_social_relationships_even_vs_odd(chickens):
+    """
+    Assign friendships and enmities based on even and odd indices.
+
+    Even-indexed chickens are friends with all other even-indexed chickens,
+    and odd-indexed chickens are friends with all other odd-indexed chickens.
+    Chickens at even indices and odd indices are enemies.
+
+    Args:
+        chickens: List of FollowerChicken instances
+    """
+    n_chicken = len(chickens)
+
+    # Iterate over all chickens to assign relationships
+    for i in range(n_chicken):
+        # Chickens at even indices are friends with all other even-indexed chickens
+        if i % 2 == 0:
+            for j in range(i + 1, n_chicken):
+                if j % 2 == 0:  # Same parity, even index -> friendship
+                    chickens[i].add_friend(chickens[j])
+                    chickens[j].add_friend(chickens[i])  # Mutual friendship
+        # Chickens at odd indices are friends with all other odd-indexed chickens
+        else:
+            for j in range(i + 1, n_chicken):
+                if j % 2 != 0:  # Same parity, odd index -> friendship
+                    chickens[i].add_friend(chickens[j])
+                    chickens[j].add_friend(chickens[i])  # Mutual friendship
+    
+    # Assign enmities between even and odd indexed chickens
+    for i in range(n_chicken):
+        for j in range(i + 1, n_chicken):
+            if (i % 2 == 0 and j % 2 != 0) or (i % 2 != 0 and j % 2 == 0):
+                chickens[i].add_enemy(chickens[j])
+                chickens[j].add_enemy(chickens[i])  # Mutual enmity
+    
+    # Print relationship statistics
+    print("\nSocial Relationship Statistics:")
+    friend_counts = [len(chicken.friends) for chicken in chickens]
+    enemy_counts = [len(chicken.enemies) for chicken in chickens]
+    for chicken_id in range(len(chickens)):
+        print(f"Chicken {chickens[chicken_id].id} has friends: {[c.id for c in chickens[chicken_id].friends]} and enemies {[c.id for c in chickens[chicken_id].enemies]}")
+    print(f"Average friends per chicken: {sum(friend_counts)/n_chicken:.2f}")
+    print(f"Average enemies per chicken: {sum(enemy_counts)/n_chicken:.2f}")
+    print(f"Most popular chicken has {max(friend_counts)} friends")
+    print(f"Most hated chicken has {max(enemy_counts)} enemies")
+    print(f"Most antisocial chicken has {min(friend_counts)} friends and {min(enemy_counts)} enemies")
+
 
 def assign_social_relationships(chickens):
     """
@@ -168,6 +219,7 @@ def assign_social_relationships(chickens):
     print(f"Most hated chicken has {max(enemy_counts)} enemies")
     print(f"Most antisocial chicken has {min(friend_counts)} friends and {min(enemy_counts)} enemies")
 
+
 if __name__ == "__main__":
     seed = 0 # 5
     random.seed(seed)
@@ -179,9 +231,10 @@ if __name__ == "__main__":
     N_CHICKEN = 20
     ANALYZE_ONLY_CHICKEN = False
     USE_FOLLOWER_CHICKENS = True  # Set to False to use the original RandomChicken behavior
-    N_STEPS=1440*10
+    N_STEPS=1440
     VISUAL = False
     INTERVAL = 10
+    GROUPS = False
     print(f"Need {3*(60/5)*4=} observations and have {N_STEPS/INTERVAL=}")
     # Run the simulation
     avg_adj_list, names, df = run_simulation(
@@ -193,6 +246,7 @@ if __name__ == "__main__":
         n_steps = N_STEPS,
         visual=VISUAL,
         adj_matrix_interval= INTERVAL,
+        groups=GROUPS,
     )
     
     if USE_FOLLOWER_CHICKENS:
