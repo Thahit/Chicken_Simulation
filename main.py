@@ -2,7 +2,7 @@ from src.Cage import Cage
 from src.Chicken import RandomChicken
 from src.Chicken import WeightedRandomChicken
 from src.Chicken import FollowerChicken
-from src.utils import calculate_avg_adj_list, visualize_graph, read_all_weeks, create_graph_from_adj_matrix
+from src.utils import calculate_avg_adj_list, visualize_graph, read_all_weeks, create_graph_from_adj_matrix, find_roles
 import random
 import numpy as np
 
@@ -58,14 +58,15 @@ def run_simulation(use_follower_chickens=False, height=8, width=12, n_chicken=20
     
     print("Analysis")
     df = read_all_weeks(adj_lists, week_size=5)
-    
-    visualize_graph(avg_adj_list, names, min_weight=.1,
+     
+    visualize_graph(avg_adj_list, names, min_weight=.11,
                     max_size=n_chicken if analyze_only_chicken else None)
     # Create graph visualization
     create_graph_from_adj_matrix(avg_adj_list, all_object_names=names, 
                               clustering_method='louvain', 
                               max_size=n_chicken if analyze_only_chicken else None)
     
+    #find_roles(avg_adj_list, max_size=n_chicken if analyze_only_chicken else None)
     return avg_adj_list, names, df
 
 def assign_social_relationships(chickens):
@@ -159,7 +160,8 @@ def assign_social_relationships(chickens):
     print("\nSocial Relationship Statistics:")
     friend_counts = [len(chicken.friends) for chicken in chickens]
     enemy_counts = [len(chicken.enemies) for chicken in chickens]
-    
+    for chicken_id in range(len(chickens)):
+        print(f"Chicken {chickens[chicken_id].id} has friends: {[c.id for c in chickens[chicken_id].friends]} and enemies {[c.id for c in chickens[chicken_id].enemies]}")
     print(f"Average friends per chicken: {sum(friend_counts)/n_chicken:.2f}")
     print(f"Average enemies per chicken: {sum(enemy_counts)/n_chicken:.2f}")
     print(f"Most popular chicken has {max(friend_counts)} friends")
@@ -167,13 +169,17 @@ def assign_social_relationships(chickens):
     print(f"Most antisocial chicken has {min(friend_counts)} friends and {min(enemy_counts)} enemies")
 
 if __name__ == "__main__":
+    seed = 0 # 5
+    random.seed(seed)
+    np.random.seed(seed)
+
     # Parameters
     HEIGHT = 10
     WIDTH = 18
     N_CHICKEN = 20
-    ANALYZE_ONLY_CHICKEN = True
+    ANALYZE_ONLY_CHICKEN = False
     USE_FOLLOWER_CHICKENS = True  # Set to False to use the original RandomChicken behavior
-    N_STEPS=1440
+    N_STEPS=1440*10
     VISUAL = False
     INTERVAL = 10
     print(f"Need {3*(60/5)*4=} observations and have {N_STEPS/INTERVAL=}")
@@ -189,7 +195,6 @@ if __name__ == "__main__":
         adj_matrix_interval= INTERVAL,
     )
     
-    # Additional analysis can be added here
     if USE_FOLLOWER_CHICKENS:
         print("\nAnalyzing social groups and behavior patterns...")
         # Add any follower-specific analysis here

@@ -52,8 +52,9 @@ class Chicken(GridObject, ABC):
         return chickens, food, water
         
     def consume_energy(self):
-        self.food -=1
+        self.food -=.8
         self.water -=1
+        self.clean -=.1
 
 class RandomChicken(Chicken):
     def move(self):
@@ -174,20 +175,17 @@ class FollowerChicken(WeightedRandomChicken):
         move_scores = []
         
         # Parameters
-        memory_decay = 10  # How quickly chicken "forgets" visited locations
-        base_random_weight = 1.0  # Base weight for randomness
+        memory_decay = 100  # How quickly chicken "forgets" visited locations
+        base_random_weight = .1  # Base weight for randomness
         
         # Calculate need levels (higher value = greater need)
-        # Fix: Use self.food instead of self.hunger
-        hunger_need = max(0, (100 - self.food) / 100)  # 0 when full, 1 when starving
-        # Fix: Use self.water instead of self.thirst
-        thirst_need = max(0, (100 - self.water) / 100)  # 0 when not thirsty, 1 when very thirsty
-        # Fix: Use self.clean instead of self.cleanliness
-        cleanliness_need = max(0, (100 - self.clean) / 100)  # 0 when clean, 1 when dirty
-        
-        # Need weights - how much each need influences decisions
-        hunger_weight = 20
-        thirst_weight = 3.5  
+        hunger_need =  max(0, (100 - self.food) / 100)**2
+        thirst_need = max(0, (100 - self.water) / 100) **2
+        cleanliness_need = max(0, (100 - self.clean) / 100)**2  
+        #print(f"Needs: current food: {self.food}, hunger: {hunger_need}, current water: {self.water}, thirst: {thirst_need}, cleanliness: {cleanliness_need}")
+         
+        hunger_weight = 7.0
+        thirst_weight = 8  
         cleanliness_weight = 1.0  # Less critical than food/water
         
         # Calculate current distances to nearest resources
@@ -209,16 +207,19 @@ class FollowerChicken(WeightedRandomChicken):
             
             # Calculate new distances after potential move
             new_pos = (new_x, new_y)
-            
+            new_dist_to_food = min([abs(new_x - fx) + abs(new_y - fy) for fx, fy in self.food_coords], default=float('inf'))
+            new_dist_to_water = min([abs(new_x - wx) + abs(new_y - wy) for wx, wy in self.water_coords], default=float('inf'))
+            new_dist_to_bath = min([abs(new_x - bx) + abs(new_y - by) for bx, by in self.bath_coords], default=float('inf'))
+            #print(f"distance changes - food: {new_dist_to_food-current_dist_to_food}, water: {new_dist_to_water-current_dist_to_water}, bath: {new_dist_to_bath-current_dist_to_bath}")
             # Direct resource bonus - highest if standing on the resource
-            if new_pos in self.food_coords:
-                score += hunger_need * hunger_weight * 3  # Extra bonus for being on food
+            if new_dist_to_food <current_dist_to_food:
+                score += hunger_need * hunger_weight   # Extra bonus for being on food
             
-            if new_pos in self.water_coords:
-                score += thirst_need * thirst_weight * 3  # Extra bonus for being on water
+            if new_dist_to_water < current_dist_to_water:
+                score += thirst_need * thirst_weight   # Extra bonus for being on water
             
-            if new_pos in self.bath_coords:
-                score += cleanliness_need * cleanliness_weight * 3  # Extra bonus for being on bath
+            if new_dist_to_bath < current_dist_to_bath:
+                score += cleanliness_need * cleanliness_weight   # Extra bonus for being on bath
             
             # Distance-based attraction to resources
             new_dist_to_food = min([abs(new_x - fx) + abs(new_y - fy) for fx, fy in self.food_coords], default=float('inf'))
@@ -253,7 +254,9 @@ class FollowerChicken(WeightedRandomChicken):
                 elif new_dist_to_friend > 0:
                     # Still apply some attraction to be near friend, even if not moving closer
                     proximity_factor = 1 / max(1, new_dist_to_friend)
-                    score += self.friend_attraction * proximity_factor * 0.5  # Reduced effect
+                    score_change = self.friend_attraction * proximity_factor
+                    #print(f"score: {score}, added: {score_change}")
+                    score +=  score_change # Reduced effect
             
             # Enemy repulsion - avoid squares closer to enemies
             for enemy in self.enemies:
@@ -290,7 +293,7 @@ class FollowerChicken(WeightedRandomChicken):
         # Normalize scores to probabilities
         total_score = sum(move_scores)
         move_probabilities = [score/total_score for score in move_scores]
-        
+        #print(f"Move probabilities: {move_probabilities}")
         # Choose move based on calculated probabilities
         chosen_index = np.random.choice(len(possible_moves), p=move_probabilities)
         dx, dy = possible_moves[chosen_index]
