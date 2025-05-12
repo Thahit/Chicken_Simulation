@@ -3,7 +3,7 @@ from src.Water import Water
 from src.Bath import Bath
 import numpy as np
 import pygame
-
+import cv2
 
 class Cage:
     def __init__(self, width, height, chickens, food_positions, water_positions, bath_positions):
@@ -98,9 +98,10 @@ class Cage:
         return adj_matrices
     
     
-    def simulate_visual(self, steps, adj_matrix_interval=None, visual=True, burn_in =100):
+    def simulate_visual(self, steps, adj_matrix_interval=None, visual=True, burn_in =100, record=True, fps = 3):
         for _ in range(burn_in):
             self.update()
+        
         if visual:
             pygame.init()
             self.TILE_SIZE = 64  # or whatever size you want
@@ -130,15 +131,29 @@ class Cage:
             }
             for key in self.IMAGES:
                 self.IMAGES[key] = pygame.transform.scale(self.IMAGES[key], (self.TILE_SIZE, self.TILE_SIZE))
+            if record:
+                
+                fourcc = cv2.VideoWriter_fourcc(*'MJPG')  # or 'XVID'
+                video_writer = cv2.VideoWriter('video.avi', fourcc, fps, (self.width * self.TILE_SIZE, self.height * self.TILE_SIZE))
 
         adj_matrices = []
         for step in range(steps):
             self.update()
             if visual:
-                self.display()
+                self.display(fps)
+                if record:
+                        frame = pygame.surfarray.array3d(self.screen)
+                        frame = np.transpose(frame, (1, 0, 2))  # now (height, width, 3)
+                        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                        video_writer.write(frame)
+
             if adj_matrix_interval and step % adj_matrix_interval == 0:
                 adj_matrices.append(self.get_adj_matr())
         
+        if visual:
+            if record:
+                video_writer.release()
+            pygame.quit()
         print("End report:")
         for chicken in self.chickens:
             #print the status of each chicken
@@ -146,7 +161,8 @@ class Cage:
 
         return adj_matrices
     
-    def display(self):
+
+    def display(self, fps=3):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -171,4 +187,4 @@ class Cage:
                 self.screen.blit(img, (x * self.TILE_SIZE, y * self.TILE_SIZE))
 
         pygame.display.flip()
-        self.clock.tick(2)  # Control FPS
+        self.clock.tick(fps)  # Control FPS
