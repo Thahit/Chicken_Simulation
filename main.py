@@ -225,11 +225,11 @@ if __name__ == "__main__":
     N_CHICKEN = 20
     ANALYZE_ONLY_CHICKEN = False
     USE_FOLLOWER_CHICKENS = True  # Set to False to use the original RandomChicken behavior
-    N_STEPS=1440 #*5
+    N_STEPS=1800 
     VISUAL = False
     INTERVAL = 10
     GROUPS = False
-    print(f"Need {3*(60/5)*4=} observations and have {N_STEPS/INTERVAL=}")
+    print(f"Need {3*(60/5)*5=} observations and have {N_STEPS/INTERVAL=}")
     # Run the simulation
     avg_adj_list, names, df = run_simulation(
         use_follower_chickens=USE_FOLLOWER_CHICKENS,

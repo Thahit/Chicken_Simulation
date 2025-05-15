@@ -82,13 +82,14 @@ def visualize_graph(adj_matrix, all_object_names, min_weight=None, max_size=None
     
     # Draw edge labels
     labels = nx.get_edge_attributes(G, 'weight')
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
-    
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=labels
+                                 )
     ax = plt.gca()
-    sm = plt.cm.ScalarMappable(cmap=cmap)
-    sm.set_array([])  # Empty array, just to create the colorbar
-    cbar = plt.colorbar(sm, ax=ax)  # Pass the axis explicitly to colorbar
-    cbar.set_label('Edge Weight (Low -> High)')
+    if False:#draw color legend
+        sm = plt.cm.ScalarMappable(cmap=cmap)
+        sm.set_array([])  # Empty array, just to create the colorbar
+        cbar = plt.colorbar(sm, ax=ax)  # Pass the axis explicitly to colorbar
+        cbar.set_label('Edge Weight (Low -> High)')
 
     legend_labels = {
         'chicken': 'red',
