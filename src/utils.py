@@ -1,11 +1,10 @@
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches  # For adding legend
+import matplotlib.patches as mpatches 
 import pandas as pd
-import community as community_louvain  # For modularity-based community detection
-from networkx.algorithms.community import label_propagation_communities  # For other clustering methods
-
+import community as community_louvain  
+from networkx.algorithms.community import label_propagation_communities 
 
 def normalize_adj_matrix(adj_matrix: np.array):
     # Normalize the adjacency matrix
@@ -28,7 +27,7 @@ def create_graph(adj_matrix, min_weight=None, max_size=None):
     G.add_nodes_from(range(num_nodes))
 
     for i in range(num_nodes):
-        for j in range(i + 1, num_nodes):  # Assuming an undirected graph
+        for j in range(i + 1, num_nodes):  # Assuming an undirected graph(otherwise unreadable)
             weight = adj_matrix[i, j]
             if weight != 0 and (min_weight is None or weight >= min_weight):
                 G.add_edge(i, j, weight=round(weight, 2))
