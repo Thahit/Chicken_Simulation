@@ -1,0 +1,6 @@
+numpy>=2.0.0
+matplotlib>=3.5.0
+networkx>=3.0
+pandas>=2.0.0
+pygame>=2.5.0
+python-louvain>=0.15
